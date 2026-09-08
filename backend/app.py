@@ -15,7 +15,12 @@ from functools import wraps
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": [
+    "http://127.0.0.1:5500",
+    "http://localhost:5500",
+    "http://127.0.0.1:5000",
+    "https://upbeat-education-production-cce4.up.railway.app"
+]}})
 
 def obtener_conexion():
     return psycopg2.connect(os.getenv('DATABASE_URL'))
