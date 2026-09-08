@@ -545,5 +545,45 @@ def obtener_alertas():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
+@app.route('/inventario/movimientos', methods=['GET'])
+@verificar_token
+def obtener_movimientos():
+    try:
+        conn   = obtener_conexion()
+        cursor = conn.cursor()
+
+        cursor.execute('''
+            SELECT m.id, p.nombre, t.nombre, m.tipo, m.cantidad,
+                   e.nombre, m.fecha
+            FROM movimientos m
+            JOIN productos p  ON p.id = m.producto_id
+            JOIN tiendas t    ON t.id = m.tienda_id
+            JOIN empleados e  ON e.id = m.empleado_id
+            ORDER BY m.fecha DESC
+            LIMIT 20
+        ''')
+
+        filas = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+        movimientos = []
+        for fila in filas:
+            movimientos.append({
+                'id':        fila[0],
+                'producto':  fila[1],
+                'tienda':    fila[2],
+                'tipo':      fila[3],
+                'cantidad':  fila[4],
+                'empleado':  fila[5],
+                'fecha':     fila[6].strftime('%d/%m/%Y %H:%M')
+            })
+
+        return jsonify(movimientos)
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
     app.run(debug=True)
