@@ -1,8 +1,11 @@
+import sys
+import os
+sys.path.insert(0, os.path.dirname(__file__))
+
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from dotenv import load_dotenv
 import psycopg2
-import os
 import uuid
 import jwt
 import bcrypt
