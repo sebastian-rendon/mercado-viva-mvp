@@ -397,5 +397,153 @@ def verificar():
         'nombre': request.empleado_nombre
     })
 
+
+# ── INVENTARIO ─────────────────────────────────────────
+@app.route('/inventario/movimiento', methods=['POST'])
+@verificar_token
+def registrar_movimiento():
+    try:
+        datos       = request.get_json()
+        producto_id = datos.get('producto_id')
+        tienda_id   = datos.get('tienda_id')
+        tipo        = datos.get('tipo')
+        cantidad    = datos.get('cantidad')
+
+        if not all([producto_id, tienda_id, tipo, cantidad]):
+            return jsonify({'error': 'producto_id, tienda_id, tipo y cantidad son obligatorios'}), 400
+
+        if tipo not in ('entrada', 'salida'):
+            return jsonify({'error': 'tipo debe ser entrada o salida'}), 400
+
+        if cantidad <= 0:
+            return jsonify({'error': 'La cantidad debe ser mayor a cero'}), 400
+
+        conn   = obtener_conexion()
+        cursor = conn.cursor()
+
+        # Verificar que exista el inventario
+        cursor.execute('''
+            SELECT stock_disponible FROM inventario
+            WHERE producto_id = %s AND tienda_id = %s
+        ''', (producto_id, tienda_id))
+
+        fila = cursor.fetchone()
+        if not fila:
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'Producto o tienda no encontrados'}), 404
+
+        stock_actual = fila[0]
+
+        # Validar que no quede stock negativo en salida
+        if tipo == 'salida' and stock_actual < cantidad:
+            cursor.close()
+            conn.close()
+            return jsonify({
+                'error': 'Stock insuficiente para registrar salida',
+                'stock_actual': stock_actual
+            }), 409
+
+        # Actualizar stock
+        if tipo == 'entrada':
+            cursor.execute('''
+                UPDATE inventario
+                SET stock_disponible = stock_disponible + %s
+                WHERE producto_id = %s AND tienda_id = %s
+            ''', (cantidad, producto_id, tienda_id))
+        else:
+            cursor.execute('''
+                UPDATE inventario
+                SET stock_disponible = stock_disponible - %s
+                WHERE producto_id = %s AND tienda_id = %s
+            ''', (cantidad, producto_id, tienda_id))
+
+        # Registrar movimiento
+        cursor.execute('''
+            INSERT INTO movimientos (producto_id, tienda_id, tipo, cantidad, empleado_id)
+            VALUES (%s, %s, %s, %s, %s)
+            RETURNING id
+        ''', (producto_id, tienda_id, tipo, cantidad, request.empleado_id))
+
+        movimiento_id = cursor.fetchone()[0]
+
+        # Verificar stock resultante
+        cursor.execute('''
+            SELECT stock_disponible, umbral_minimo, p.nombre
+            FROM inventario i
+            JOIN productos p ON p.id = i.producto_id
+            WHERE i.producto_id = %s AND i.tienda_id = %s
+        ''', (producto_id, tienda_id))
+
+        fila          = cursor.fetchone()
+        stock_nuevo   = fila[0]
+        umbral_minimo = fila[1]
+        nombre        = fila[2]
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        respuesta = {
+            'mensaje': f'Movimiento de {tipo} registrado exitosamente',
+            'movimiento_id': movimiento_id,
+            'producto': nombre,
+            'stock_anterior': stock_actual,
+            'stock_nuevo': stock_nuevo
+        }
+
+        if stock_nuevo <= umbral_minimo and stock_nuevo > 0:
+            respuesta['alerta'] = f'⚠️ Stock bajo: quedan {stock_nuevo} unidades (umbral: {umbral_minimo})'
+        elif stock_nuevo == 0:
+            respuesta['alerta'] = '🚫 Producto sin disponibilidad'
+
+        return jsonify(respuesta), 201
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/inventario/alertas', methods=['GET'])
+@verificar_token
+def obtener_alertas():
+    try:
+        conn   = obtener_conexion()
+        cursor = conn.cursor()
+
+        cursor.execute('''
+            SELECT p.id, p.nombre, p.sku, p.umbral_minimo,
+                   i.stock_disponible, t.nombre AS tienda, t.id AS tienda_id
+            FROM inventario i
+            JOIN productos p ON p.id = i.producto_id
+            JOIN tiendas t   ON t.id = i.tienda_id
+            WHERE i.stock_disponible <= p.umbral_minimo
+            ORDER BY i.stock_disponible ASC
+        ''', )
+
+        filas = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+        alertas = []
+        for fila in filas:
+            alertas.append({
+                'producto_id':      fila[0],
+                'producto':         fila[1],
+                'sku':              fila[2],
+                'umbral_minimo':    fila[3],
+                'stock_disponible': fila[4],
+                'tienda':           fila[5],
+                'tienda_id':        fila[6],
+                'sin_stock':        fila[4] == 0
+            })
+
+        return jsonify({
+            'total_alertas': len(alertas),
+            'alertas': alertas
+        })
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
     app.run(debug=True)
