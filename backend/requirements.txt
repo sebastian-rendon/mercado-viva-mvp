@@ -4,3 +4,4 @@ psycopg2-binary==2.9.10
 python-dotenv==1.0.1
 pyjwt==2.8.0
 gunicorn==22.0.0
+bcrypt==4.1.3

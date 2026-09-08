@@ -4,7 +4,10 @@ from dotenv import load_dotenv
 import psycopg2
 import os
 import uuid
+import jwt
+import bcrypt
 from datetime import datetime, timezone, timedelta
+from functools import wraps
 
 load_dotenv()
 
@@ -13,6 +16,35 @@ CORS(app)
 
 def obtener_conexion():
     return psycopg2.connect(os.getenv('DATABASE_URL'))
+
+# ── AUTENTICACIÓN ──────────────────────────────────────
+def verificar_token(f):
+    @wraps(f)
+    def decorador(*args, **kwargs):
+        token = None
+        auth_header = request.headers.get('Authorization')
+
+        if auth_header and auth_header.startswith('Bearer '):
+            token = auth_header.split(' ')[1]
+
+        if not token:
+            return jsonify({'error': 'Token requerido'}), 401
+
+        try:
+            datos = jwt.decode(
+                token,
+                os.getenv('JWT_SECRET'),
+                algorithms=['HS256']
+            )
+            request.empleado_id = datos['empleado_id']
+            request.empleado_nombre = datos['nombre']
+        except jwt.ExpiredSignatureError:
+            return jsonify({'error': 'Token expirado'}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({'error': 'Token inválido'}), 401
+
+        return f(*args, **kwargs)
+    return decorador
 
 # ── PING ──────────────────────────────────────────────
 @app.route('/ping', methods=['GET'])
@@ -304,6 +336,66 @@ def liberar_expiradas():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
+# ── AUTH ───────────────────────────────────────────────
+@app.route('/auth/login', methods=['POST'])
+def login():
+    try:
+        datos    = request.get_json()
+        email    = datos.get('email')
+        password = datos.get('password')
+
+        if not email or not password:
+            return jsonify({'error': 'Email y contraseña son obligatorios'}), 400
+
+        conn   = obtener_conexion()
+        cursor = conn.cursor()
+
+        cursor.execute('''
+            SELECT id, nombre, email, password_hash
+            FROM empleados
+            WHERE email = %s
+        ''', (email,))
+
+        empleado = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if not empleado:
+            return jsonify({'error': 'Credenciales inválidas'}), 401
+
+        password_valido = bcrypt.checkpw(
+            password.encode('utf-8'),
+            empleado[3].encode('utf-8')
+        )
+
+        if not password_valido:
+            return jsonify({'error': 'Credenciales inválidas'}), 401
+
+        token = jwt.encode({
+            'empleado_id': empleado[0],
+            'nombre': empleado[1],
+            'exp': datetime.now(timezone.utc) + timedelta(hours=8)
+        }, os.getenv('JWT_SECRET'), algorithm='HS256')
+
+        return jsonify({
+            'mensaje': 'Login exitoso',
+            'token': token,
+            'nombre': empleado[1]
+        })
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/auth/verificar', methods=['GET'])
+@verificar_token
+def verificar():
+    return jsonify({
+        'mensaje': 'Token válido',
+        'empleado_id': request.empleado_id,
+        'nombre': request.empleado_nombre
+    })
 
 if __name__ == '__main__':
     app.run(debug=True)
