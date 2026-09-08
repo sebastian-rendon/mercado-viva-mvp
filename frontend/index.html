@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mercado VIVA</title>
+  <link rel="stylesheet" href="css/estilos.css" />
+</head>
+<body>
+
+  <header>
+    <div class="header-contenido">
+      <h1>Mercado VIVA</h1>
+      <a href="panel.html" class="btn-panel">Panel empleado</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="filtros">
+      <label for="selectTienda">Selecciona una tienda:</label>
+      <select id="selectTienda">
+        <option value="">-- Todas las tiendas --</option>
+        <option value="1">Sucursal Centro</option>
+        <option value="2">Sucursal Norte</option>
+      </select>
+    </section>
+
+    <section id="seccionProductos">
+      <p class="cargando">Selecciona una tienda para ver los productos.</p>
+    </section>
+  </main>
+
+  <!-- Modal de reserva -->
+  <div id="modalReserva" class="modal oculto">
+    <div class="modal-contenido">
+      <h2>Confirmar reserva</h2>
+      <p id="modalProductoNombre"></p>
+      <div class="campo-cantidad">
+        <label for="inputCantidad">Cantidad:</label>
+        <input type="number" id="inputCantidad" min="1" value="1" />
+      </div>
+      <p id="modalStockDisponible"></p>
+      <div class="modal-botones">
+        <button id="btnConfirmarReserva" class="btn-confirmar">Reservar</button>
+        <button id="btnCancelarModal" class="btn-cancelar">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de éxito -->
+  <div id="modalExito" class="modal oculto">
+    <div class="modal-contenido">
+      <h2>Reserva confirmada</h2>
+      <p id="exitoMensaje"></p>
+      <p class="contador-label">Tu reserva expira en:</p>
+      <p id="contadorTiempo" class="contador"></p>
+      <button id="btnCerrarExito" class="btn-confirmar">Entendido</button>
+    </div>
+  </div>
+
+  <script src="js/cliente.js"></script>
+</body>
+</html>
