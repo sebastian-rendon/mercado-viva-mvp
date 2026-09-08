@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Panel Empleado — Mercado VIVA</title>
+  <link rel="stylesheet" href="css/estilos.css"/>
+  <link rel="stylesheet" href="css/panel.css"/>
+</head>
+<body>
+
+  <!-- LOGIN -->
+  <div id="seccionLogin">
+    <div class="login-caja">
+      <h2>Acceso empleados</h2>
+      <p class="login-subtitulo">Mercado VIVA</p>
+      <div class="campo">
+        <label>Email</label>
+        <input type="email" id="inputEmail" placeholder="empleado@mercadoviva.com"/>
+      </div>
+      <div class="campo">
+        <label>Contraseña</label>
+        <input type="password" id="inputPassword" placeholder="••••••••"/>
+      </div>
+      <p id="loginError" class="error-msg oculto"></p>
+      <button id="btnLogin" class="btn-confirmar">Ingresar</button>
+    </div>
+  </div>
+
+  <!-- PANEL PRINCIPAL -->
+  <div id="seccionPanel" class="oculto">
+
+    <header>
+      <div class="header-contenido">
+        <h1>Panel de inventario</h1>
+        <div class="header-derecha">
+          <span id="nombreEmpleado"></span>
+          <button id="btnCerrarSesion" class="btn-cerrar-sesion">Cerrar sesión</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+
+      <!-- ALERTAS -->
+      <section class="seccion">
+        <h2>Alertas de stock bajo</h2>
+        <div id="contenedorAlertas">
+          <p class="cargando">Cargando alertas...</p>
+        </div>
+      </section>
+
+      <!-- FORMULARIO DE MOVIMIENTO -->
+      <section class="seccion">
+        <h2>Registrar movimiento</h2>
+        <div class="formulario-movimiento">
+          <div class="campo">
+            <label>Tienda</label>
+            <select id="selectTiendaPanel">
+              <option value="1">Sucursal Centro</option>
+              <option value="2">Sucursal Norte</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label>Producto</label>
+            <select id="selectProductoPanel">
+              <option value="">Cargando...</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label>Tipo</label>
+            <select id="selectTipo">
+              <option value="entrada">Entrada</option>
+              <option value="salida">Salida</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label>Cantidad</label>
+            <input type="number" id="inputCantidadPanel" min="1" value="1"/>
+          </div>
+          <button id="btnRegistrar" class="btn-confirmar">Registrar</button>
+        </div>
+        <p id="mensajeMovimiento" class="oculto"></p>
+      </section>
+
+      <!-- MOVIMIENTOS RECIENTES -->
+      <section class="seccion">
+        <h2>Movimientos recientes</h2>
+        <div id="contenedorMovimientos">
+          <p class="cargando">Cargando movimientos...</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="js/panel.js"></script>
+</body>
+</html>

@@ -4,6 +4,8 @@ __pycache__/
 .venv/
 venv/
 .env
+*.pyc
+.pytest_cache/
 
 # VS Code
 .vscode/

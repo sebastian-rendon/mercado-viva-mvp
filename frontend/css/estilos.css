@@ -1,0 +1,239 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #f4f6f8;
+  color: #333;
+}
+
+/* HEADER */
+header {
+  background: #1a73e8;
+  color: white;
+  padding: 1rem 2rem;
+}
+
+.header-contenido {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.btn-panel {
+  background: white;
+  color: #1a73e8;
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* MAIN */
+main {
+  max-width: 1100px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+/* FILTROS */
+.filtros {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.filtros label {
+  font-weight: 600;
+}
+
+.filtros select {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+/* GRID DE PRODUCTOS */
+.grid-productos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+/* TARJETA */
+.tarjeta {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tarjeta h3 {
+  font-size: 1.1rem;
+  color: #1a73e8;
+}
+
+.tarjeta .sku {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.tarjeta .categoria {
+  font-size: 0.85rem;
+  background: #e8f0fe;
+  color: #1a73e8;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  width: fit-content;
+}
+
+.tarjeta .stock {
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+.stock-ok { color: #2e7d32; }
+.stock-bajo { color: #f57c00; }
+.stock-cero { color: #c62828; }
+
+.badge-bajo {
+  background: #fff3e0;
+  color: #f57c00;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  width: fit-content;
+}
+
+.badge-agotado {
+  background: #ffebee;
+  color: #c62828;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  width: fit-content;
+}
+
+/* BOTONES */
+.btn-agregar {
+  margin-top: auto;
+  padding: 0.6rem;
+  background: #1a73e8;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.btn-agregar:hover { background: #1558b0; }
+
+.btn-agregar:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* MODAL */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal.oculto { display: none; }
+
+.modal-contenido {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.modal-contenido h2 { color: #1a73e8; }
+
+.campo-cantidad {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.campo-cantidad input {
+  width: 80px;
+  padding: 0.4rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.modal-botones {
+  display: flex;
+  gap: 1rem;
+}
+
+.btn-confirmar {
+  flex: 1;
+  padding: 0.7rem;
+  background: #1a73e8;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-cancelar {
+  flex: 1;
+  padding: 0.7rem;
+  background: #eee;
+  color: #333;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.contador {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a73e8;
+  text-align: center;
+}
+
+.contador-label {
+  text-align: center;
+  color: #666;
+}
+
+.cargando {
+  color: #888;
+  font-style: italic;
+}
+
+.error-msg {
+  color: #c62828;
+  padding: 1rem;
+  background: #ffebee;
+  border-radius: 8px;
+}
