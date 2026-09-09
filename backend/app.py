@@ -1,4 +1,5 @@
 import sys
+import os
 sys.path.insert(0, os.path.dirname(__file__))
 
 from flask import Flask, jsonify, request
@@ -8,7 +9,6 @@ import psycopg2
 import uuid
 import jwt
 import bcrypt
-import os
 from datetime import datetime, timezone, timedelta
 from functools import wraps
 
