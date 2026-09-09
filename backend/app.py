@@ -1,5 +1,4 @@
 import sys
-import os
 sys.path.insert(0, os.path.dirname(__file__))
 
 from flask import Flask, jsonify, request
@@ -9,18 +8,14 @@ import psycopg2
 import uuid
 import jwt
 import bcrypt
+import os
 from datetime import datetime, timezone, timedelta
 from functools import wraps
 
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": [
-    "http://127.0.0.1:5500",
-    "http://localhost:5500",
-    "http://127.0.0.1:5000",
-    "https://upbeat-education-production-cce4.up.railway.app"
-]}})
+CORS(app)
 
 def obtener_conexion():
     return psycopg2.connect(os.getenv('DATABASE_URL'))
