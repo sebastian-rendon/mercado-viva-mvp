@@ -53,17 +53,20 @@ function crearTarjeta(producto) {
     badgeHTML  = '<span class="badge-agotado">Sin disponibilidad</span>';
   } else if (producto.stock_bajo) {
     claseStock = 'stock-bajo';
-    badgeHTML  = '<span class="badge-bajo">Últimas unidades</span>';
+    badgeHTML  = '<span class="badge-bajo">Ultimas unidades</span>';
   }
 
   tarjeta.innerHTML = `
-    <h3>${producto.nombre}</h3>
-    <span class="sku">SKU: ${producto.sku}</span>
-    <span class="categoria">${producto.categoria}</span>
-    <p class="stock ${claseStock}">
-      Stock disponible: ${producto.stock_disponible}
-    </p>
-    ${badgeHTML}
+    <div class="tarjeta-imagen">
+      <img src="${obtenerImagen(producto.sku)}" alt="${producto.nombre}"/>
+    </div>
+    <div class="tarjeta-cuerpo">
+      <h3>${producto.nombre}</h3>
+      <span class="sku">SKU: ${producto.sku}</span>
+      <span class="categoria">${producto.categoria}</span>
+      <p class="stock ${claseStock}">Stock disponible: ${producto.stock_disponible}</p>
+      <div class="badge-espacio">${badgeHTML}</div>
+    </div>
     <button
       class="btn-agregar"
       ${producto.sin_disponibilidad ? 'disabled' : ''}
@@ -78,6 +81,15 @@ function crearTarjeta(producto) {
 
   tarjeta.querySelector('.btn-agregar').addEventListener('click', abrirModal);
   return tarjeta;
+}
+
+function obtenerImagen(sku) {
+  const imagenes = {
+    'ARR-001': 'img/arroz.png',
+    'ACE-002': 'img/aceite.png',
+    'LEC-003': 'img/leche.png',
+  };
+  return imagenes[sku] || 'img/default.png';
 }
 
 // ── MODAL DE RESERVA ───────────────────────────────────
